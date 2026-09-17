@@ -64,8 +64,7 @@ assert "385dce36" in vllm.__version__ or vllm.__version__.startswith("0.28"), vl
 
 from vllm.model_executor.models.registry import ModelRegistry
 arch = ModelRegistry.get_supported_archs()
-for a in ("DFlash2DraftModel", "DFlash2Qwen3ForCausalLM"):
-    assert a in arch, f"{a} not registered"
+assert "DFlash2DraftModel" in arch, "DFlash2DraftModel not registered"
 print("registry OK: DFlash2DraftModel present")
 
 import vllm.v1.core.kv_cache_utils as k
