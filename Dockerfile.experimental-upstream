@@ -40,7 +40,7 @@
 # Reproducibility = this digest + the guarded bake, not the tag.
 #
 # Build (on an aarch64 SM121 host — e.g. a DGX Spark; cross-builds are not supported):
-#   docker build -t ghcr.io/canada-quant/vllm-glm53-flash-sm121:v1-w4a16-dflash2e .
+#   docker build -t ghcr.io/canada-quant/vllm-glm53-flash-sm121:v2-w4a16-dflash2e .
 
 ARG BASE_IMAGE=vllm/vllm-openai:glm53-flash-arm64-cu130@sha256:b0501f99fec5136f248f78d5850977a2ec32d55cd9a665f4a9ffef24cbdf7fe5
 FROM ${BASE_IMAGE}
