@@ -9,7 +9,7 @@
 
 ```bash
 # 1. On BOTH nodes: pull the image, fetch the weights
-docker pull ghcr.io/canada-quant/vllm-glm53-flash-sm121:v1-w4a16-dflash2e
+docker pull ghcr.io/canada-quant/vllm-glm53-flash-sm121:v2-w4a16-dflash2e
 huggingface-cli download canada-quant/GLM-5.3-Flash-W4A16-MTP --local-dir /models/glm53-w4a16
 huggingface-cli download canada-quant/GLM-5.3-Flash-DFlash2-E --local-dir /models/GLM-5.3-Flash-DFlash2-E
 
@@ -39,7 +39,7 @@ The launcher defaults are the banked production config: TP=2 + expert-parallel, 
 Only if you want to modify the patches. The published image was built on an aarch64 SM121 host:
 
 ```bash
-docker build -t ghcr.io/canada-quant/vllm-glm53-flash-sm121:v1-w4a16-dflash2e .
+docker build -t ghcr.io/canada-quant/vllm-glm53-flash-sm121:v2-w4a16-dflash2e .
 ```
 
 The build applies `patches/bake_patches.py` to the pinned base and **fails** (anchor refused) if upstream drifted. `patches/overlays/` carries the two full-file overlays; `patches/archive/` keeps the historical fork-era `sparse_attn_indexer_kpool.py` (sha256 `8a3ecfb0bab2…`) for provenance — its top-k fix is subsumed upstream at the pinned base (`sparse_attn_indexer_kpool.py:417`).
