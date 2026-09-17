@@ -2,9 +2,8 @@
 
 **One-command serving of [GLM-5.3-Flash W4A16](https://huggingface.co/canada-quant/GLM-5.3-Flash-W4A16-MTP) + a [DFlash2 speculative-decoding drafter](https://huggingface.co/canada-quant/GLM-5.3-Flash-DFlash2-E) on 2× NVIDIA DGX Spark (GB10, SM121a), tensor-parallel over RoCE.**
 
-- **Image**: `ghcr.io/canada-quant/vllm-glm53-flash-sm121:v1-w4a16-dflash2e` (aarch64)
-- **Lineage**: official upstream `vllm/vllm-openai:glm53-flash-arm64-cu130` (pinned digest `sha256:b0501f99…`, vLLM `0.28.1rc1.dev580+g385dce36b`, FlashInfer `0.6.18`, CUDA 13.0) **+ the canada-quant SM121 patch overlay only** — every patch is authored in this repo and applied by a guarded script that refuses to build on upstream drift. No opaque third-party fork layers.
-- **What the overlay fixes on SM121**: NoPE sparse-MLA routing (`qk_rope_head_dim=0`), the fa3 smem overflow, FP8-KV device gates, the sm_121a JIT gencode, PDL races on KDA state kernels, Eagle3 aux-hidden-state taps for the drafter, and the GLM-5 KV fast-path retention with the drafter's full-attention layers (`DFLASH2-DRAFTER-GROUP`).
+- **Image**: `ghcr.io/canada-quant/vllm-glm53-flash-sm121:v2-w4a16-dflash2e` (aarch64)
+- **Lineage**: the public DGX-Spark bring-up image `ghcr.io/canada-quant/vllm-glm53-flash-base:sm121-v11-dflash2` (pinned digest `sha256:4def0ef6…`; vLLM fork `0.1.dev20051+g487ecf187`, FlashInfer `0.6.18.dev20260819`, CUDA 13.0) **+ the two serving-critical canada-quant patches baked in** — `sparse_attn_indexer_kpool.py` (NoPE sparse-indexer top-k fix) and `kv_cache_utils.py` (`DFLASH2-DRAFTER-GROUP`), both sha256-gated at build time to the exact production bytes. No host-side patch bind-mounts needed to serve. (An experimental upstream-nightly-based build exists at `Dockerfile.experimental-upstream`; it is known-broken on SM121 — see "Known failures".)
 
 ## TL;DR — two nodes, four commands
 
@@ -106,7 +105,23 @@ NOTICE.md                               attribution + license chain
 
 ## License & attribution
 
-Apache-2.0 (this repo's authored content). The image is built on upstream vLLM/FlashInfer Apache-2.0 artifacts. See [`NOTICE.md`](NOTICE.md) — which also documents the friendly-debt line to the community bring-up author's public DGX-Spark bring-up (their repo carries no license; nothing is copied from it, but their published routing insight informed ours).
+Apache-2.0 (this repo's authored content). The v2 image is built on the
+`canada-quant/vllm-glm53-flash-base` public DGX-Spark bring-up image (itself an
+Apache-2.0 vLLM fork build) + the two canada-quant patches in `patches/fork/`
+(sha-gated at build). The v1 experimental image is built on official upstream
+`vllm/vllm-openai` Apache-2.0 artifacts. See [`NOTICE.md`](NOTICE.md) — which
+also documents the friendly-debt line to the community bring-up author's published routing insight.
+
+## Known failures (do not repeat)
+
+- **v1 / upstream-nightly base (`Dockerfile.experimental-upstream`)**: boots
+  through target + drafter load, then dies at FlashInfer sparse-MLA warmup on
+  real SM121 hardware — `flashinfer_mla_sparse_sm90.py:483 forward_mqa →
+  Failed to run MLA, error: invalid argument` — with AND without
+  `--no-enable-flashinfer-autotune` (gate attempts 2026-09-17 05:09Z / 05:29Z).
+  The two `patches/fork/` bytes are load-bearing for this path and have no
+  upstream-nightly equivalent yet. Rebase stays parked until that lands.
+
 
 ## Status
 

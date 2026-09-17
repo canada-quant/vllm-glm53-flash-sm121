@@ -12,7 +12,10 @@
 #   Run the WORKER (1) FIRST, wait ~25 s, then the HEAD (0) on the other node.
 #
 # Knobs (defaults = the proven 262K g4 config):
-#   IMAGE            image to serve from (default ghcr.io/canada-quant/vllm-glm53-flash-sm121:v1-w4a16-dflash2e)
+#   IMAGE            image to serve from (default ghcr.io/canada-quant/vllm-glm53-flash-sm121:v2-w4a16-dflash2e)
+#   FLAVOR           v2 (default; fork base — --kv-cache-memory dialect, no autotune flag)
+#                    | v1 (experimental upstream nightly — --kv-cache-memory-bytes +
+#                      --no-enable-flashinfer-autotune). Auto-detected from $IMAGE if unset.
 #   MODEL_DIR        W4A16 target weights on THIS node (default /home/pcozz/models/glm-5.3-w4a16-mtp —
 #                    adjust to wherever your canada-quant/GLM-5.3-Flash-W4A16-MTP checkout lives)
 #   DRAFTER_HOST_PATH  drafter weights dir (default /models/GLM-5.3-Flash-DFlash2-E —
@@ -24,7 +27,12 @@
 #                    GRAPHS=0 EAGER=1 = eager fallback
 set -euo pipefail
 
-IMAGE="${IMAGE:-ghcr.io/canada-quant/vllm-glm53-flash-sm121:v1-w4a16-dflash2e}"
+IMAGE="${IMAGE:-ghcr.io/canada-quant/vllm-glm53-flash-sm121:v2-w4a16-dflash2e}"
+# Flavor: v2 = fork base (proven) engine dialect; v1 = upstream nightly (experimental).
+# The two bases renamed engine flags between them; the launcher picks the dialect.
+case "${FLAVOR:-auto}" in
+  auto) case "$IMAGE" in *v1-w4a16*) FLAVOR=v1 ;; *) FLAVOR=v2 ;; esac ;;
+esac
 NAME="vllm_node"
 MAX_MODEL_LEN="${MAX_MODEL_LEN:-262144}"
 KV_CACHE_MEM="${KV_CACHE_MEM:-8053063680}"
@@ -54,6 +62,20 @@ fi
 
 NODE_RANK="${1:?usage: launch_glm53_w4a16_dflash2_sm121.sh <0|1>}"
 [[ "$NODE_RANK" == "0" || "$NODE_RANK" == "1" ]] || { echo "rank must be 0 or 1" >&2; exit 2; }
+
+# Engine-flag dialect per base flavor:
+#   v2 (fork base, PROVEN): --kv-cache-memory <bytes>; no autotune flag (predates it).
+#   v1 (upstream nightly, EXPERIMENTAL): --kv-cache-memory-bytes <bytes> +
+#     --no-enable-flashinfer-autotune (the nightly's autotune warmup dummy-run
+#     trips the SM121 MLA shared-memory limit; see README "Known failures").
+if [ "$FLAVOR" = "v1" ]; then
+  KV_FLAG="--kv-cache-memory-bytes $KV_CACHE_MEM"
+  AUTOTUNE_FLAG="--no-enable-flashinfer-autotune"
+else
+  KV_FLAG="--kv-cache-memory $KV_CACHE_MEM"
+  AUTOTUNE_FLAG=""
+fi
+
 
 case "$NODE_RANK" in
   0) HOST_IP="${HOST_IP_RANK0:-192.168.102.1}"; HEADLESS="" ;;
@@ -118,8 +140,9 @@ docker run --gpus all -d \
   --max-model-len "$MAX_MODEL_LEN" \
   --max-num-seqs "$MAX_NUM_SEQS" --block-size "$BLOCK_SIZE" \
   --speculative-config '{"method":"dflash","model":"/models/dflash2-draft","num_speculative_tokens":'"$SPEC_NUM_TOKENS"'}' \
-  --kv-cache-dtype fp8_e4m3 --kv-cache-memory-bytes "$KV_CACHE_MEM" \
-  --no-enable-flashinfer-autotune \
+  --kv-cache-dtype fp8_e4m3 \
+  $KV_FLAG \
+  $AUTOTUNE_FLAG \
   $EAGER_FLAG \
   "${GRAPH_ARGS[@]}" \
   --tool-call-parser glm47 --enable-auto-tool-choice \
