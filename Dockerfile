@@ -10,6 +10,7 @@
 # bind-mounts eliminated: no host-side patch files needed to serve.
 #
 #   base: ghcr.io/canada-quant/vllm-glm53-flash-base:sm121-v11-dflash2
+#         (re-hosted community DGX-Spark GLM-5.3-Flash bring-up image)
 #         (Apache-2.0 vLLM fork build with the SM121 fixes; vLLM 0.1.dev20051+g487ecf187,
 #          FlashInfer 0.6.18.dev20260819, torch 2.13.0+cu130, CUDA 13.0)
 #   baked patches (exact production bytes, sha256-gated by the RUN below):
