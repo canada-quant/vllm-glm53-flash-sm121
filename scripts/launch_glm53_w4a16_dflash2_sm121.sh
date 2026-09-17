@@ -30,7 +30,7 @@ MAX_MODEL_LEN="${MAX_MODEL_LEN:-262144}"
 KV_CACHE_MEM="${KV_CACHE_MEM:-8053063680}"
 MAX_NUM_SEQS="${MAX_NUM_SEQS:-6}"
 MODEL_DIR="${MODEL_DIR:-/home/pcozz/models/glm-5.3-w4a16-mtp}"
-MODEL_PATH="$MODEL_DIR/"DRAFTER_HOST_PATH="${DRAFTER_HOST_PATH:-/models/GLM-5.3-Flash-DFlash2-E}"
+MODEL_PATH="/models/glm53-w4a16"DRAFTER_HOST_PATH="${DRAFTER_HOST_PATH:-/models/GLM-5.3-Flash-DFlash2-E}"
 CACHE_HOST_PATH="/var/tmp/glm53-vllm-cache"
 SPEC_NUM_TOKENS="${SPEC_NUM_TOKENS:-7}"
 EAGER="${EAGER:-0}"
@@ -80,6 +80,7 @@ docker run --gpus all -d \
   --ulimit memlock=-1:-1 --cap-add IPC_LOCK \
   --device /dev/infiniband:/dev/infiniband \
   -v "$MODEL_DIR:$MODEL_PATH" \
+  -v "$DRAFTER_HOST_PATH:/models/dflash2-draft:ro" \
   -v "$CACHE_HOST_PATH:/cache" \
   -v "$CACHE_HOST_PATH/flashinfer:/root/.cache/flashinfer" \
   -v "$CACHE_HOST_PATH/tilelang:/root/.tilelang" \
