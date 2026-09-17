@@ -3,7 +3,7 @@
 **One-command serving of [GLM-5.3-Flash W4A16](https://huggingface.co/canada-quant/GLM-5.3-Flash-W4A16-MTP) + a [DFlash2 speculative-decoding drafter](https://huggingface.co/canada-quant/GLM-5.3-Flash-DFlash2-E) on 2× NVIDIA DGX Spark (GB10, SM121a), tensor-parallel over RoCE.**
 
 - **Image**: `ghcr.io/canada-quant/vllm-glm53-flash-sm121:v2-w4a16-dflash2e` (aarch64)
-- **Lineage**: the public DGX-Spark bring-up image `ghcr.io/tonyd2wild/vllm-glm53-flash:sm121-v11-dflash2` (pinned digest `sha256:4def0ef6…`; vLLM fork `0.1.dev20051+g487ecf187`, FlashInfer `0.6.18.dev20260819`, CUDA 13.0) **+ the two serving-critical canada-quant patches baked in** — `sparse_attn_indexer_kpool.py` (NoPE sparse-indexer top-k fix) and `kv_cache_utils.py` (`DFLASH2-DRAFTER-GROUP`), both sha256-gated at build time to the exact production bytes. No host-side patch bind-mounts needed to serve. (An experimental upstream-nightly-based build exists at `Dockerfile.experimental-upstream`; it is known-broken on SM121 — see "Known failures".)
+- **Lineage**: a public community DGX-Spark GLM-5.3-Flash bring-up image (re-hosted for reproducibility at `ghcr.io/canada-quant/vllm-glm53-flash-base:sm121-v11-dflash2`, pinned digest `sha256:4def0ef6…`; vLLM fork `0.1.dev20051+g487ecf187`, FlashInfer `0.6.18.dev20260819`, CUDA 13.0) **+ the two serving-critical canada-quant patches baked in** — `sparse_attn_indexer_kpool.py` (NoPE sparse-indexer top-k fix) and `kv_cache_utils.py` (`DFLASH2-DRAFTER-GROUP`), both sha256-gated at build time to the exact production bytes. No host-side patch bind-mounts needed to serve. (An experimental upstream-nightly-based build exists at `Dockerfile.experimental-upstream`; it is known-broken on SM121 — see "Known failures".)
 
 ## TL;DR — two nodes, four commands
 
@@ -105,12 +105,12 @@ NOTICE.md                               attribution + license chain
 
 ## License & attribution
 
-Apache-2.0 (this repo's authored content). The v2 image is built on the
-`tonyd2wild/vllm-glm53-flash` public DGX-Spark bring-up image (itself an
-Apache-2.0 vLLM fork build) + the two canada-quant patches in `patches/fork/`
+Apache-2.0 (this repo's authored content). The v2 image is built on an Apache-2.0
+community vLLM fork build (re-hosted at
+`ghcr.io/canada-quant/vllm-glm53-flash-base:sm121-v11-dflash2`) + the two canada-quant patches in `patches/fork/`
 (sha-gated at build). The v1 experimental image is built on official upstream
 `vllm/vllm-openai` Apache-2.0 artifacts. See [`NOTICE.md`](NOTICE.md) — which
-also documents the friendly-debt line to tonyd2wild's published routing insight.
+also documents the friendly-debt line to the original community-published routing insight.
 
 ## Known failures (do not repeat)
 

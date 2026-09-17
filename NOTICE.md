@@ -9,7 +9,7 @@ Authored content (Dockerfile, `patches/bake_patches.py`, overlays, launcher, doc
 
 | Artifact | License | Role |
 |---|---|---|
-| [vLLM](https://github.com/vllm-project/vllm) fork build `0.1.dev20051+g487ecf187` (image `ghcr.io/tonyd2wild/vllm-glm53-flash:sm121-v11-dflash2`, digest `sha256:4def0ef644cb2e9814136dcffd5e385e21bc594f48f3b292234051904abe85a6`) | Apache-2.0 | v2 base image: GLM-5.3-Flash model support, DFlash2 spec-decode, speculators-format drafter loading, the mask-embedding loader, the SM121 sparse-MLA routing |
+| [vLLM](https://github.com/vllm-project/vllm) fork build `0.1.dev20051+g487ecf187` (re-hosted at `ghcr.io/canada-quant/vllm-glm53-flash-base:sm121-v11-dflash2`, digest `sha256:4def0ef644cb2e9814136dcffd5e385e21bc594f48f3b292234051904abe85a6`) | Apache-2.0 | v2 base image: GLM-5.3-Flash model support, DFlash2 spec-decode, speculators-format drafter loading, the mask-embedding loader, the SM121 sparse-MLA routing |
 | [FlashInfer](https://github.com/flashinfer-ai/flashinfer) 0.6.18.dev20260819 | Apache-2.0 | Sparse-MLA attention kernels (fa2 path) |
 | [DFlash2](https://github.com/z-lab/dflash) ([arXiv 2602.06036](https://arxiv.org/abs/2602.06036)) | (method paper) | The speculative-decoding method |
 
@@ -28,15 +28,14 @@ stack. The kvcu hunk was previously published (H200 lane) inside
 
 ## Friendly debt (no code copied)
 
-tonyd2wild's public [GLM-5.3-Flash-NVFP4-DFlash2-2x-DGX-Spark](https://github.com/tonyd2wild/GLM-5.3-Flash-NVFP4-DFlash2-2x-DGX-Spark)
-bring-up documented the SM121 day-0 pitfalls (the SM90-NoPE backend being the only
+A public community GLM-5.3-Flash DGX-Spark bring-up repository documented the SM121 day-0 pitfalls (the SM90-NoPE backend being the only
 capability-12 route for NoPE sparse MLA, the fa2 smem constraint, the PDL race) and
 the official-image-plus-Dockerfile build shape. **Their repository carries no
 license file**, so nothing from it is copied into this repo or baked into the
 image — every patch here is canada-quant-authored against upstream bytes (their
 routing insight is acknowledged as prior art). The historical fork image
-(`radixark/vllm-glm53-flash:sm121-v11-dflash2`, now 404 on Docker Hub; mirrored at
-`ghcr.io/tonyd2wild/vllm-glm53-flash:sm121-v11-dflash2`) that carried those
+(`radixark/vllm-glm53-flash:sm121-v11-dflash2`, now 404 on Docker Hub; re-hosted at
+`ghcr.io/canada-quant/vllm-glm53-flash-base:sm121-v11-dflash2`) that carried those
 same-class fixes is **not** a layer of this image.
 
 ## Historical fork files
@@ -49,6 +48,6 @@ provenance chain). Derived from vLLM's Apache-2.0
 `sparse_attn_indexer_kpool.py` of the fork era.
 
 The historical fork image (`radixark/vllm-glm53-flash:sm121-v11-dflash2`, now
-404 on Docker Hub; mirrored byte-identically at
-`ghcr.io/tonyd2wild/vllm-glm53-flash:sm121-v11-dflash2`, digest
+404 on Docker Hub; re-hosted byte-identically at
+`ghcr.io/canada-quant/vllm-glm53-flash-base:sm121-v11-dflash2`, digest
 `sha256:4def0ef6…`) **is a layer of the v2 image** — as the pinned base.

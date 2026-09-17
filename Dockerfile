@@ -9,7 +9,8 @@
 # passed the full adoption gate (boot fuses + smoke + graphs-ON g4 config), with the
 # bind-mounts eliminated: no host-side patch files needed to serve.
 #
-#   base: ghcr.io/tonyd2wild/vllm-glm53-flash:sm121-v11-dflash2
+#   base: ghcr.io/canada-quant/vllm-glm53-flash-base:sm121-v11-dflash2
+#         (re-hosted community DGX-Spark GLM-5.3-Flash bring-up image)
 #         (Apache-2.0 vLLM fork build with the SM121 fixes; vLLM 0.1.dev20051+g487ecf187,
 #          FlashInfer 0.6.18.dev20260819, torch 2.13.0+cu130, CUDA 13.0)
 #   baked patches (exact production bytes, sha256-gated by the RUN below):
@@ -32,7 +33,7 @@
 # Build (on an aarch64 SM121 host — e.g. a DGX Spark; cross-builds are not supported):
 #   docker build -t ghcr.io/canada-quant/vllm-glm53-flash-sm121:v2-w4a16-dflash2e .
 
-ARG BASE_IMAGE=ghcr.io/tonyd2wild/vllm-glm53-flash:sm121-v11-dflash2@sha256:4def0ef644cb2e9814136dcffd5e385e21bc594f48f3b292234051904abe85a6
+ARG BASE_IMAGE=ghcr.io/canada-quant/vllm-glm53-flash-base:sm121-v11-dflash2@sha256:4def0ef644cb2e9814136dcffd5e385e21bc594f48f3b292234051904abe85a6
 FROM ${BASE_IMAGE}
 
 # The two serving-critical fork patches, baked at their import paths:
@@ -76,5 +77,5 @@ LABEL org.opencontainers.image.title="vllm-glm53-flash-sm121" \
       org.opencontainers.image.description="GLM-5.3-Flash W4A16 + DFlash2 drafter serving on DGX Spark (SM121a), TP=2 — fork base + sha-gated production patches" \
       org.opencontainers.image.vendor="canada-quant" \
       org.opencontainers.image.source="https://github.com/canada-quant/vllm-glm53-flash-sm121" \
-      org.opencontainers.image.base.name="ghcr.io/tonyd2wild/vllm-glm53-flash" \
+      org.opencontainers.image.base.name="ghcr.io/canada-quant/vllm-glm53-flash-base" \
       org.opencontainers.image.base.digest="sha256:4def0ef644cb2e9814136dcffd5e385e21bc594f48f3b292234051904abe85a6"
