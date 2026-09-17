@@ -119,6 +119,7 @@ docker run --gpus all -d \
   --max-num-seqs "$MAX_NUM_SEQS" --block-size "$BLOCK_SIZE" \
   --speculative-config '{"method":"dflash","model":"/models/dflash2-draft","num_speculative_tokens":'"$SPEC_NUM_TOKENS"'}' \
   --kv-cache-dtype fp8_e4m3 --kv-cache-memory-bytes "$KV_CACHE_MEM" \
+  --no-enable-flashinfer-autotune \
   $EAGER_FLAG \
   "${GRAPH_ARGS[@]}" \
   --tool-call-parser glm47 --enable-auto-tool-choice \
