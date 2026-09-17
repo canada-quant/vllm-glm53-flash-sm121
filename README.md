@@ -42,7 +42,7 @@ Only if you want to modify the patches. The published image was built on an aarc
 docker build -t ghcr.io/canada-quant/vllm-glm53-flash-sm121:v2-w4a16-dflash2e .
 ```
 
-The build applies `patches/bake_patches.py` to the pinned base and **fails** (anchor refused) if upstream drifted. `patches/overlays/` carries the two full-file overlays; `patches/archive/` keeps the historical fork-era `sparse_attn_indexer_kpool.py` (sha256 `8a3ecfb0bab2…`) for provenance — its top-k fix is subsumed upstream at the pinned base (`sparse_attn_indexer_kpool.py:417`).
+The build applies `patches/bake_patches.py` to the pinned base and **fails** (anchor refused) if upstream drifted. `patches/fork/` carries the two serving-critical patches baked into v2 — byte-identical to the production stack's runtime-mounts, sha256-gated by the Dockerfile's RUN gate. `patches/overlays/` holds the full-file overlays used only by `Dockerfile.experimental-upstream` (the known-broken upstream-nightly arm — see "Known failures"). `patches/archive/` retains the historical fork-era `sparse_attn_indexer_kpool.py` (sha256 `8a3ecfb0bab2…`) for provenance — identical bytes to the fork copy it documents.
 
 ## Serving configuration (provenance)
 
