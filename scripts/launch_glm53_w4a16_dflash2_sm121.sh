@@ -3,7 +3,7 @@
 # TP=2 across two DGX Spark GB10 (SM121a) nodes, from the canada-quant SM121 image.
 #
 # Adapted from the canada-quant serving launcher (sha256 a21f06f4f71d…, published at
-# https://huggingface.co/canada-quant/GLM-5.3-Flash-DFlash2-E/blob/main/launch_dflash2_tp2.sh)
+# https://huggingface.co/canada-quant/GLM-5.3-Flash-DFlash2-F/blob/main/launch_dflash2_tp2.sh)
 # with ONE delta: IMAGE = the canada-quant SM121 image (patches baked in — no
 # bind-mounts needed). Engine args are the banked, owner-ruled g4 graphs-ON production
 # config (see README "Serving configuration" for provenance).
@@ -18,7 +18,7 @@
 #                      --no-enable-flashinfer-autotune). Auto-detected from $IMAGE if unset.
 #   MODEL_DIR        W4A16 target weights on THIS node (default /home/pcozz/models/glm-5.3-w4a16-mtp —
 #                    adjust to wherever your canada-quant/GLM-5.3-Flash-W4A16-MTP checkout lives)
-#   DRAFTER_HOST_PATH  drafter weights dir (default /models/GLM-5.3-Flash-DFlash2-E —
+#   DRAFTER_HOST_PATH  drafter weights dir (default /models/GLM-5.3-Flash-DFlash2-F; the previous release -E is a drop-in —
 #                    see README "Drafter pluggability" to swap in an enhanced drafter)
 #   MAX_MODEL_LEN    262144 (default) | 1048576 (1M; needs KV_CACHE_MEM raise, see README)
 #   KV_CACHE_MEM     bytes; default 8053063680 = 8 GiB -> 366,749-token pool @262K (g4)
@@ -39,7 +39,7 @@ KV_CACHE_MEM="${KV_CACHE_MEM:-8053063680}"
 MAX_NUM_SEQS="${MAX_NUM_SEQS:-6}"
 MODEL_DIR="${MODEL_DIR:-/home/pcozz/models/glm-5.3-w4a16-mtp}"
 MODEL_PATH="/models/glm53-w4a16"
-DRAFTER_HOST_PATH="${DRAFTER_HOST_PATH:-/models/GLM-5.3-Flash-DFlash2-E}"
+DRAFTER_HOST_PATH="${DRAFTER_HOST_PATH:-/models/GLM-5.3-Flash-DFlash2-F}"
 CACHE_HOST_PATH="/var/tmp/glm53-vllm-cache"
 SPEC_NUM_TOKENS="${SPEC_NUM_TOKENS:-7}"
 EAGER="${EAGER:-0}"

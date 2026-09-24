@@ -1,8 +1,9 @@
 # vllm-glm53-flash-sm121
 
-**One-command serving of [GLM-5.3-Flash W4A16](https://huggingface.co/canada-quant/GLM-5.3-Flash-W4A16-MTP) + a [DFlash2 speculative-decoding drafter](https://huggingface.co/canada-quant/GLM-5.3-Flash-DFlash2-E) on 2× NVIDIA DGX Spark (GB10, SM121a), tensor-parallel over RoCE.**
+**One-command serving of [GLM-5.3-Flash W4A16](https://huggingface.co/canada-quant/GLM-5.3-Flash-W4A16-MTP) + a [DFlash2 speculative-decoding drafter](https://huggingface.co/canada-quant/GLM-5.3-Flash-DFlash2-F) on 2× NVIDIA DGX Spark (GB10, SM121a), tensor-parallel over RoCE.**
 
-- **Image**: `ghcr.io/canada-quant/vllm-glm53-flash-sm121:v2-w4a16-dflash2e` (aarch64)
+- **Image**: `ghcr.io/canada-quant/vllm-glm53-flash-sm121:v2-w4a16-dflash2e` (aarch64; the tag records the drafter it was validated with — the drafter is bind-mounted, so the same image serves `-F`)
+- **Drafter (current)**: [`canada-quant/GLM-5.3-Flash-DFlash2-F`](https://huggingface.co/canada-quant/GLM-5.3-Flash-DFlash2-F) — drop-in successor of [`-E`](https://huggingface.co/canada-quant/GLM-5.3-Flash-DFlash2-E) (same architecture, K=7): 3.626 mean acceptance at K=7 on the 500-prompt holdout, +0.065 over `-E` on the same hardware and parity with the incoai reference measured the same day (3.632). `-E` remains what the banked Spark numbers below were measured with.
 - **Lineage**: a public community DGX-Spark GLM-5.3-Flash bring-up image (re-hosted for reproducibility at `ghcr.io/canada-quant/vllm-glm53-flash-base:sm121-v11-dflash2`, pinned digest `sha256:4def0ef6…`; vLLM fork `0.1.dev20051+g487ecf187`, FlashInfer `0.6.18.dev20260819`, CUDA 13.0) **+ the two serving-critical canada-quant patches baked in** — `sparse_attn_indexer_kpool.py` (NoPE sparse-indexer top-k fix) and `kv_cache_utils.py` (`DFLASH2-DRAFTER-GROUP`), both sha256-gated at build time to the exact production bytes. No host-side patch bind-mounts needed to serve. (An experimental upstream-nightly-based build exists at `Dockerfile.experimental-upstream`; it is known-broken on SM121 — see "Known failures".)
 
 ## TL;DR — two nodes, four commands
@@ -11,7 +12,7 @@
 # 1. On BOTH nodes: pull the image, fetch the weights
 docker pull ghcr.io/canada-quant/vllm-glm53-flash-sm121:v2-w4a16-dflash2e
 huggingface-cli download canada-quant/GLM-5.3-Flash-W4A16-MTP --local-dir /models/glm53-w4a16
-huggingface-cli download canada-quant/GLM-5.3-Flash-DFlash2-E --local-dir /models/GLM-5.3-Flash-DFlash2-E
+huggingface-cli download canada-quant/GLM-5.3-Flash-DFlash2-F --local-dir /models/GLM-5.3-Flash-DFlash2-F
 
 # 2. Copy the launcher from this repo to both nodes, then:
 bash launch_glm53_w4a16_dflash2_sm121.sh 1 &   # WORKER first (rank 1)
@@ -31,7 +32,7 @@ The launcher defaults are the banked production config: TP=2 + expert-parallel, 
 | Nodes | 2× DGX Spark (GB10, SM121a, 128 GB unified memory each) |
 | Interconnect | RoCE/IB between the two (the authors use VLAN 102, MTU 9000, `rocep1s0f1`/`enp1s0f1np1`) — adjust `IB_HCA`/`SOCK_IF`/`IB_RANGE` in the launcher |
 | Disk | ~200 GiB per node for weights (~178 GiB target + ~6.2 GB drafter) + image (~21 GB) |
-| Weights | `canada-quant/GLM-5.3-Flash-W4A16-MTP` (target) + `canada-quant/GLM-5.3-Flash-DFlash2-E` (drafter) |
+| Weights | `canada-quant/GLM-5.3-Flash-W4A16-MTP` (target) + `canada-quant/GLM-5.3-Flash-DFlash2-F` (drafter; `-E` still works: `DRAFTER_HOST_PATH=/models/GLM-5.3-Flash-DFlash2-E`) |
 | Model card | Read the target's card for the quant design (INT4 g128 on routed experts only) and the full hardware matrix |
 
 ## Build the image yourself
@@ -71,12 +72,12 @@ The drafter is **not** baked into the image. It is a bind-mounted directory (`DR
 
 ```bash
 # Swap to an enhanced drafter (example):
-DRAFTER_HOST_PATH=/models/GLM-5.3-Flash-DFlash2-F bash launch_glm53_w4a16_dflash2_sm121.sh 1
+DRAFTER_HOST_PATH=/models/GLM-5.3-Flash-DFlash2-E bash launch_glm53_w4a16_dflash2_sm121.sh 1   # e.g. back to the previous release
 ```
 
 **Rules for a drop-in drafter:**
 
-1. **Dir layout**: `model.safetensors` + `config.json` + `mask_embedding.pt` (+ optional `PROVENANCE.txt`), exactly like [`GLM-5.3-Flash-DFlash2-E`](https://huggingface.co/canada-quant/GLM-5.3-Flash-DFlash2-E).
+1. **Dir layout**: `model.safetensors` + `config.json` + `mask_embedding.pt` (+ optional `PROVENANCE.txt`), exactly like [`GLM-5.3-Flash-DFlash2-F`](https://huggingface.co/canada-quant/GLM-5.3-Flash-DFlash2-F) / [`-E`](https://huggingface.co/canada-quant/GLM-5.3-Flash-DFlash2-E).
 2. **K follows the architecture**: `num_speculative_tokens = block_size − 1` (E: block 8 → K=7). Set `SPEC_NUM_TOKENS` to match; anything else boot-wedges.
 3. **Version discipline**: drafters are versioned by their HF repo id (`…-E`, `…-F`, …) with the config's `dflash_config.target_layer_ids` as the compatibility contract — the target-side aux-tap overlay honors whatever the drafter's config declares (9 taps for E: `[5,9,14,19,24,28,33,38,42]`). A drafter that changes tap geometry needs no image change; it needs its config to be truthful.
 4. **Verify after swap**: boot gate 4 (mask-loader line) + a sanity generation (below). No image rebuild, no target-side change.
