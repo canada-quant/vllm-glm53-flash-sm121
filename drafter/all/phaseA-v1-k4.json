@@ -1,0 +1,23 @@
+{
+  "label": "phaseA-v1-k4",
+  "url": "http://127.0.0.1:8100",
+  "prompts": 500,
+  "ok": 500,
+  "fail": 0,
+  "concurrency": 16,
+  "max_tokens": 1024,
+  "wall_s": 431.0,
+  "output_tokens": 478057,
+  "output_tok_per_s": 1109.2,
+  "drafts": 196694.0,
+  "draft_tokens": 786776.0,
+  "accepted_tokens": 281395.0,
+  "mean_acceptance_length": 2.431,
+  "draft_token_acceptance_rate": 0.3577,
+  "per_position_acceptance_rate": {
+    "0": 0.6445,
+    "1": 0.3946,
+    "2": 0.2419,
+    "3": 0.1496
+  }
+}

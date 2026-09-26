@@ -1,0 +1,23 @@
+{
+  "label": "smoke8k-drafter-k4",
+  "url": "http://127.0.0.1:8100",
+  "prompts": 100,
+  "ok": 100,
+  "fail": 0,
+  "concurrency": 16,
+  "max_tokens": 1024,
+  "wall_s": 205.0,
+  "output_tokens": 93963,
+  "output_tok_per_s": 458.4,
+  "drafts": 86556.0,
+  "draft_tokens": 346224.0,
+  "accepted_tokens": 7311.0,
+  "mean_acceptance_length": 1.084,
+  "draft_token_acceptance_rate": 0.0211,
+  "per_position_acceptance_rate": {
+    "0": 0.084,
+    "1": 0.0005,
+    "2": 0.0,
+    "3": 0.0
+  }
+}

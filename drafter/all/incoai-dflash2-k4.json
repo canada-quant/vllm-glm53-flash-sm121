@@ -1,0 +1,23 @@
+{
+  "label": "incoai-dflash2-k4",
+  "url": "http://127.0.0.1:8100",
+  "prompts": 500,
+  "ok": 500,
+  "fail": 0,
+  "concurrency": 16,
+  "max_tokens": 1024,
+  "wall_s": 363.7,
+  "output_tokens": 474802,
+  "output_tok_per_s": 1305.4,
+  "drafts": 152091.0,
+  "draft_tokens": 608364.0,
+  "accepted_tokens": 322897.0,
+  "mean_acceptance_length": 3.123,
+  "draft_token_acceptance_rate": 0.5308,
+  "per_position_acceptance_rate": {
+    "0": 0.7642,
+    "1": 0.5758,
+    "2": 0.4414,
+    "3": 0.3417
+  }
+}

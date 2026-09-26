@@ -1,0 +1,26 @@
+{
+  "label": "incoai-k7-again",
+  "url": "http://127.0.0.1:8100",
+  "prompts": 500,
+  "ok": 500,
+  "fail": 0,
+  "concurrency": 16,
+  "max_tokens": 1024,
+  "wall_s": 364.8,
+  "output_tokens": 477246,
+  "output_tok_per_s": 1308.3,
+  "drafts": 132132.0,
+  "draft_tokens": 924924.0,
+  "accepted_tokens": 345501.0,
+  "mean_acceptance_length": 3.615,
+  "draft_token_acceptance_rate": 0.3735,
+  "per_position_acceptance_rate": {
+    "0": 0.7463,
+    "1": 0.5472,
+    "2": 0.4089,
+    "3": 0.313,
+    "4": 0.2453,
+    "5": 0.1959,
+    "6": 0.1583
+  }
+}

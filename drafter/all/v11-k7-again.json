@@ -1,0 +1,26 @@
+{
+  "label": "v11-k7-again",
+  "url": "http://127.0.0.1:8100",
+  "prompts": 500,
+  "ok": 500,
+  "fail": 0,
+  "concurrency": 16,
+  "max_tokens": 1024,
+  "wall_s": 395.8,
+  "output_tokens": 475159,
+  "output_tok_per_s": 1200.5,
+  "drafts": 154635.0,
+  "draft_tokens": 1082445.0,
+  "accepted_tokens": 320785.0,
+  "mean_acceptance_length": 3.074,
+  "draft_token_acceptance_rate": 0.2964,
+  "per_position_acceptance_rate": {
+    "0": 0.7165,
+    "1": 0.4791,
+    "2": 0.3216,
+    "3": 0.2203,
+    "4": 0.1532,
+    "5": 0.108,
+    "6": 0.0758
+  }
+}

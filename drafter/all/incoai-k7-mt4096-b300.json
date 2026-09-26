@@ -1,0 +1,26 @@
+{
+  "label": "incoai-k7-mt4096-b300",
+  "url": "http://127.0.0.1:8100",
+  "prompts": 500,
+  "ok": 500,
+  "fail": 0,
+  "concurrency": 16,
+  "max_tokens": 4096,
+  "wall_s": 719.8,
+  "output_tokens": 1419012,
+  "output_tok_per_s": 1971.3,
+  "drafts": 408621.0,
+  "draft_tokens": 2860347.0,
+  "accepted_tokens": 1010590.0,
+  "mean_acceptance_length": 3.473,
+  "draft_token_acceptance_rate": 0.3533,
+  "per_position_acceptance_rate": {
+    "0": 0.7276,
+    "1": 0.5226,
+    "2": 0.3838,
+    "3": 0.2906,
+    "4": 0.2259,
+    "5": 0.1789,
+    "6": 0.1438
+  }
+}

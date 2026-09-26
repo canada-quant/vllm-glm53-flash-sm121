@@ -1,0 +1,21 @@
+{
+  "label": "base-mtp-n2",
+  "url": "http://127.0.0.1:8100",
+  "prompts": 500,
+  "ok": 500,
+  "fail": 0,
+  "concurrency": 16,
+  "max_tokens": 1024,
+  "wall_s": 413.1,
+  "output_tokens": 475780,
+  "output_tok_per_s": 1151.7,
+  "drafts": 196973.0,
+  "draft_tokens": 393946.0,
+  "accepted_tokens": 278685.0,
+  "mean_acceptance_length": 2.415,
+  "draft_token_acceptance_rate": 0.7074,
+  "per_position_acceptance_rate": {
+    "0": 0.8044,
+    "1": 0.6104
+  }
+}

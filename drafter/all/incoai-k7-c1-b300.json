@@ -1,0 +1,26 @@
+{
+  "label": "incoai-k7-c1-b300",
+  "url": "http://127.0.0.1:8100",
+  "prompts": 100,
+  "ok": 100,
+  "fail": 0,
+  "concurrency": 1,
+  "max_tokens": 1024,
+  "wall_s": 287.6,
+  "output_tokens": 94419,
+  "output_tok_per_s": 328.3,
+  "drafts": 25770.0,
+  "draft_tokens": 180390.0,
+  "accepted_tokens": 68726.0,
+  "mean_acceptance_length": 3.667,
+  "draft_token_acceptance_rate": 0.381,
+  "per_position_acceptance_rate": {
+    "0": 0.7511,
+    "1": 0.5544,
+    "2": 0.4173,
+    "3": 0.3201,
+    "4": 0.2528,
+    "5": 0.2044,
+    "6": 0.1668
+  }
+}

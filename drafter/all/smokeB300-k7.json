@@ -1,0 +1,26 @@
+{
+  "label": "smokeB300-k7",
+  "url": "http://127.0.0.1:8100",
+  "prompts": 40,
+  "ok": 40,
+  "fail": 0,
+  "concurrency": 8,
+  "max_tokens": 1024,
+  "wall_s": 72.1,
+  "output_tokens": 37035,
+  "output_tok_per_s": 513.9,
+  "drafts": 9861.0,
+  "draft_tokens": 69027.0,
+  "accepted_tokens": 27202.0,
+  "mean_acceptance_length": 3.759,
+  "draft_token_acceptance_rate": 0.3941,
+  "per_position_acceptance_rate": {
+    "0": 0.7583,
+    "1": 0.561,
+    "2": 0.4292,
+    "3": 0.3388,
+    "4": 0.2712,
+    "5": 0.2179,
+    "6": 0.1821
+  }
+}

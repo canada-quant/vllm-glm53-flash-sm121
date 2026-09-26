@@ -1,0 +1,26 @@
+{
+  "label": "dflash2G-k7-mt4096",
+  "url": "http://127.0.0.1:8100",
+  "prompts": 500,
+  "ok": 500,
+  "fail": 0,
+  "concurrency": 16,
+  "max_tokens": 4096,
+  "wall_s": 742.5,
+  "output_tokens": 1427822,
+  "output_tok_per_s": 1922.9,
+  "drafts": 410622.0,
+  "draft_tokens": 2874354.0,
+  "accepted_tokens": 1017422.0,
+  "mean_acceptance_length": 3.478,
+  "draft_token_acceptance_rate": 0.354,
+  "per_position_acceptance_rate": {
+    "0": 0.7286,
+    "1": 0.5262,
+    "2": 0.3875,
+    "3": 0.2921,
+    "4": 0.2254,
+    "5": 0.1772,
+    "6": 0.1407
+  }
+}

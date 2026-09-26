@@ -1,0 +1,26 @@
+{
+  "label": "swaBest-k7",
+  "url": "http://127.0.0.1:8100",
+  "prompts": 500,
+  "ok": 500,
+  "fail": 0,
+  "concurrency": 16,
+  "max_tokens": 1024,
+  "wall_s": 377.0,
+  "output_tokens": 476184,
+  "output_tok_per_s": 1263.0,
+  "drafts": 136293.0,
+  "draft_tokens": 954051.0,
+  "accepted_tokens": 340354.0,
+  "mean_acceptance_length": 3.497,
+  "draft_token_acceptance_rate": 0.3567,
+  "per_position_acceptance_rate": {
+    "0": 0.737,
+    "1": 0.5344,
+    "2": 0.3937,
+    "3": 0.2946,
+    "4": 0.2254,
+    "5": 0.1748,
+    "6": 0.1372
+  }
+}

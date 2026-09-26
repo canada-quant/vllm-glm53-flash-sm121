@@ -1,0 +1,18 @@
+{
+  "label": "base-nospec-c1",
+  "url": "http://127.0.0.1:8100",
+  "prompts": 100,
+  "ok": 100,
+  "fail": 0,
+  "concurrency": 1,
+  "max_tokens": 1024,
+  "wall_s": 649.8,
+  "output_tokens": 94196,
+  "output_tok_per_s": 145.0,
+  "drafts": 0.0,
+  "draft_tokens": 0.0,
+  "accepted_tokens": 0.0,
+  "mean_acceptance_length": null,
+  "draft_token_acceptance_rate": null,
+  "per_position_acceptance_rate": {}
+}

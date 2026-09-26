@@ -1,0 +1,26 @@
+{
+  "label": "dsparkB-k7",
+  "url": "http://127.0.0.1:8100",
+  "prompts": 500,
+  "ok": 500,
+  "fail": 0,
+  "concurrency": 16,
+  "max_tokens": 1024,
+  "wall_s": 381.6,
+  "output_tokens": 476138,
+  "output_tok_per_s": 1247.8,
+  "drafts": 145056.0,
+  "draft_tokens": 1015392.0,
+  "accepted_tokens": 331415.0,
+  "mean_acceptance_length": 3.285,
+  "draft_token_acceptance_rate": 0.3264,
+  "per_position_acceptance_rate": {
+    "0": 0.7224,
+    "1": 0.508,
+    "2": 0.3588,
+    "3": 0.2599,
+    "4": 0.1904,
+    "5": 0.1408,
+    "6": 0.1043
+  }
+}

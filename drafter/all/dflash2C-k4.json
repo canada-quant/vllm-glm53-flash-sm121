@@ -1,0 +1,23 @@
+{
+  "label": "dflash2C-k4",
+  "url": "http://127.0.0.1:8100",
+  "prompts": 500,
+  "ok": 500,
+  "fail": 0,
+  "concurrency": 16,
+  "max_tokens": 1024,
+  "wall_s": 376.2,
+  "output_tokens": 475694,
+  "output_tok_per_s": 1264.6,
+  "drafts": 160785.0,
+  "draft_tokens": 643140.0,
+  "accepted_tokens": 315056.0,
+  "mean_acceptance_length": 2.959,
+  "draft_token_acceptance_rate": 0.4899,
+  "per_position_acceptance_rate": {
+    "0": 0.7328,
+    "1": 0.5343,
+    "2": 0.3957,
+    "3": 0.2967
+  }
+}
