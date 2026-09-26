@@ -1,0 +1,23 @@
+{
+  "label": "dsparkB-k4",
+  "url": "http://127.0.0.1:8100",
+  "prompts": 500,
+  "ok": 500,
+  "fail": 0,
+  "concurrency": 16,
+  "max_tokens": 1024,
+  "wall_s": 379.4,
+  "output_tokens": 475459,
+  "output_tok_per_s": 1253.3,
+  "drafts": 163190.0,
+  "draft_tokens": 652760.0,
+  "accepted_tokens": 312392.0,
+  "mean_acceptance_length": 2.914,
+  "draft_token_acceptance_rate": 0.4786,
+  "per_position_acceptance_rate": {
+    "0": 0.7258,
+    "1": 0.5229,
+    "2": 0.3833,
+    "3": 0.2823
+  }
+}

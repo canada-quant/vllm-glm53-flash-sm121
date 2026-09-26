@@ -1,0 +1,23 @@
+{
+  "label": "incoai-k4-b300",
+  "url": "http://127.0.0.1:8100",
+  "prompts": 500,
+  "ok": 500,
+  "fail": 0,
+  "concurrency": 16,
+  "max_tokens": 1024,
+  "wall_s": 348.4,
+  "output_tokens": 476762,
+  "output_tok_per_s": 1368.5,
+  "drafts": 152062.0,
+  "draft_tokens": 608248.0,
+  "accepted_tokens": 324858.0,
+  "mean_acceptance_length": 3.136,
+  "draft_token_acceptance_rate": 0.5341,
+  "per_position_acceptance_rate": {
+    "0": 0.7654,
+    "1": 0.5782,
+    "2": 0.4451,
+    "3": 0.3477
+  }
+}

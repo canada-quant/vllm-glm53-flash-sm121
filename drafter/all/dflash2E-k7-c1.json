@@ -1,0 +1,26 @@
+{
+  "label": "dflash2E-k7-c1",
+  "url": "http://127.0.0.1:8100",
+  "prompts": 100,
+  "ok": 100,
+  "fail": 0,
+  "concurrency": 1,
+  "max_tokens": 1024,
+  "wall_s": 354.0,
+  "output_tokens": 94616,
+  "output_tok_per_s": 267.2,
+  "drafts": 26422.0,
+  "draft_tokens": 184954.0,
+  "accepted_tokens": 68303.0,
+  "mean_acceptance_length": 3.585,
+  "draft_token_acceptance_rate": 0.3693,
+  "per_position_acceptance_rate": {
+    "0": 0.7432,
+    "1": 0.543,
+    "2": 0.4042,
+    "3": 0.3086,
+    "4": 0.2414,
+    "5": 0.1915,
+    "6": 0.1533
+  }
+}

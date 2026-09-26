@@ -1,0 +1,26 @@
+{
+  "label": "soupDDF-k7",
+  "url": "http://127.0.0.1:8100",
+  "prompts": 500,
+  "ok": 500,
+  "fail": 0,
+  "concurrency": 16,
+  "max_tokens": 1024,
+  "wall_s": 391.3,
+  "output_tokens": 475586,
+  "output_tok_per_s": 1215.5,
+  "drafts": 144781.0,
+  "draft_tokens": 1013467.0,
+  "accepted_tokens": 331139.0,
+  "mean_acceptance_length": 3.287,
+  "draft_token_acceptance_rate": 0.3267,
+  "per_position_acceptance_rate": {
+    "0": 0.7107,
+    "1": 0.5012,
+    "2": 0.3609,
+    "3": 0.2637,
+    "4": 0.1956,
+    "5": 0.1462,
+    "6": 0.1089
+  }
+}

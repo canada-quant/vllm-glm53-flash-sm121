@@ -1,0 +1,23 @@
+{
+  "label": "v11-k4",
+  "url": "http://127.0.0.1:8100",
+  "prompts": 500,
+  "ok": 500,
+  "fail": 0,
+  "concurrency": 16,
+  "max_tokens": 1024,
+  "wall_s": 384.5,
+  "output_tokens": 475464,
+  "output_tok_per_s": 1236.7,
+  "drafts": 171765.0,
+  "draft_tokens": 687060.0,
+  "accepted_tokens": 303752.0,
+  "mean_acceptance_length": 2.768,
+  "draft_token_acceptance_rate": 0.4421,
+  "per_position_acceptance_rate": {
+    "0": 0.7143,
+    "1": 0.4859,
+    "2": 0.3345,
+    "3": 0.2337
+  }
+}

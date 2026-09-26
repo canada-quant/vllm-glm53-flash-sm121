@@ -1,0 +1,26 @@
+{
+  "label": "soupE-k7",
+  "url": "http://127.0.0.1:8100",
+  "prompts": 500,
+  "ok": 500,
+  "fail": 0,
+  "concurrency": 16,
+  "max_tokens": 1024,
+  "wall_s": 373.4,
+  "output_tokens": 475581,
+  "output_tok_per_s": 1273.8,
+  "drafts": 133782.0,
+  "draft_tokens": 936474.0,
+  "accepted_tokens": 342207.0,
+  "mean_acceptance_length": 3.558,
+  "draft_token_acceptance_rate": 0.3654,
+  "per_position_acceptance_rate": {
+    "0": 0.745,
+    "1": 0.544,
+    "2": 0.4033,
+    "3": 0.3042,
+    "4": 0.2336,
+    "5": 0.1834,
+    "6": 0.1445
+  }
+}

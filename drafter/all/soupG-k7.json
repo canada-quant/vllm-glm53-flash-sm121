@@ -1,0 +1,26 @@
+{
+  "label": "soupG-k7",
+  "url": "http://127.0.0.1:8100",
+  "prompts": 500,
+  "ok": 500,
+  "fail": 0,
+  "concurrency": 16,
+  "max_tokens": 1024,
+  "wall_s": 338.3,
+  "output_tokens": 477454,
+  "output_tok_per_s": 1411.3,
+  "drafts": 129465.0,
+  "draft_tokens": 906255.0,
+  "accepted_tokens": 348454.0,
+  "mean_acceptance_length": 3.691,
+  "draft_token_acceptance_rate": 0.3845,
+  "per_position_acceptance_rate": {
+    "0": 0.7538,
+    "1": 0.5639,
+    "2": 0.4261,
+    "3": 0.3279,
+    "4": 0.2556,
+    "5": 0.2025,
+    "6": 0.1618
+  }
+}

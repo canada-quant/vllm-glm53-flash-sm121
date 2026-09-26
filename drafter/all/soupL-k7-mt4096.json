@@ -1,0 +1,26 @@
+{
+  "label": "soupL-k7-mt4096",
+  "url": "http://127.0.0.1:8100",
+  "prompts": 500,
+  "ok": 500,
+  "fail": 0,
+  "concurrency": 16,
+  "max_tokens": 4096,
+  "wall_s": 751.7,
+  "output_tokens": 1412939,
+  "output_tok_per_s": 1879.6,
+  "drafts": 409691.0,
+  "draft_tokens": 2867837.0,
+  "accepted_tokens": 1003479.0,
+  "mean_acceptance_length": 3.449,
+  "draft_token_acceptance_rate": 0.3499,
+  "per_position_acceptance_rate": {
+    "0": 0.7257,
+    "1": 0.5221,
+    "2": 0.3824,
+    "3": 0.2874,
+    "4": 0.2215,
+    "5": 0.1731,
+    "6": 0.1371
+  }
+}
