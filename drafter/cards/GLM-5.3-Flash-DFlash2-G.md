@@ -82,8 +82,8 @@ when only four are drafted. Against `-F` it is +0.050 at K=7 from 291K fresh, mo
 prompts the earlier sets never had). Fully ours (Apache-2.0, no NC/ND terms), trained on data we control, reproducible end-to-end.
 
 **DGX Spark (SM121):** `-E` reproduced its H200 acceptance on 2× Spark within 0.3% (3.5788 c16 / 3.5970 c1 vs 3.568 / 3.585). `-G` is a
-drop-in for the same launcher; its Spark same-rig A/B against the reference is the next measurement — re-measure both drafters on your rig
-with the eval kit in the repo before quoting a Spark number.
+drop-in for the same launcher and the **Spark drafter of record since 2026-09-25**: the H2H champion leg (2026-09-27; 702/702 requests, coherence-clean; tg32 d0 31.35±3.52 / c1@65k 15.34 quiescent — receipt: H2H_FINAL_VERDICT_2026-09-27.md, spark-cluster PR #27) and the live production serve both ran G (sha256-verified on both hosts). A same-rig Spark **acceptance** A/B vs the reference remains unmeasured (the acceptance table above is B300) — re-measure
+with the eval kit in the repo before quoting a Spark acceptance number.
 
 ## Serving
 
