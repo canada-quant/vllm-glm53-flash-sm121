@@ -20,9 +20,10 @@
 #                    adjust to wherever your canada-quant/GLM-5.3-Flash-W4A16-MTP checkout lives)
 #   DRAFTER_HOST_PATH  drafter weights dir (default /models/GLM-5.3-Flash-DFlash2-G; the previous releases -F / -E are drop-ins —
 #                    see README "Drafter pluggability" to swap in an enhanced drafter)
-#   MAX_MODEL_LEN    262144 (default) | 1048576 (1M; needs KV_CACHE_MEM raise, see README)
+#   MAX_MODEL_LEN    262144 (default) | 800000 (with KV_CACHE_MEM=17179869184 GMU=0.90; validated with -G)
+#                    1048576 (1M) was validated only with the incoai drafter — see README "Context length and KV memory"
 #   KV_CACHE_MEM     bytes; default 8053063680 = 8 GiB -> 366,749-token pool @262K (g4)
-#   GMU              0.795 (banked g4 value; 0.90 for the 1M serve)
+#   GMU              0.795 (banked g4 value; 0.90 for the 800K / 1M serves)
 #   GRAPHS           1 (default) = CUDA graphs FULL_AND_PIECEWISE [1,2,4,8,16,24,32];
 #                    GRAPHS=0 EAGER=1 = eager fallback
 set -euo pipefail

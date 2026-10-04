@@ -3,7 +3,7 @@
 **One-command serving of [GLM-5.3-Flash W4A16](https://huggingface.co/canada-quant/GLM-5.3-Flash-W4A16-MTP) + a [DFlash2 speculative-decoding drafter](https://huggingface.co/canada-quant/GLM-5.3-Flash-DFlash2-G) on 2× NVIDIA DGX Spark (GB10, SM121a), tensor-parallel over RoCE.**
 
 - **Image**: `ghcr.io/canada-quant/vllm-glm53-flash-sm121:v2-w4a16-dflash2e` (aarch64; the tag records the drafter it was validated with — the drafter is bind-mounted, so the same image serves `-F`)
-- **Drafter (current)**: [`canada-quant/GLM-5.3-Flash-DFlash2-G`](https://huggingface.co/canada-quant/GLM-5.3-Flash-DFlash2-G) — drop-in successor of [`-F`](https://huggingface.co/canada-quant/GLM-5.3-Flash-DFlash2-F) and [`-E`](https://huggingface.co/canada-quant/GLM-5.3-Flash-DFlash2-E) (same architecture, K=7): 3.676 mean acceptance at K=7 on the 500-prompt holdout, +0.044 over the incoai reference measured on the same hardware (3.632) and +0.050 over `-F`. `-E` remains what the banked Spark numbers below were measured with.
+- **Drafter (current)**: [`canada-quant/GLM-5.3-Flash-DFlash2-G`](https://huggingface.co/canada-quant/GLM-5.3-Flash-DFlash2-G) (for long context or non-English text, see [Drafter or the built-in MTP head?](#drafter-or-the-built-in-mtp-head)) — drop-in successor of [`-F`](https://huggingface.co/canada-quant/GLM-5.3-Flash-DFlash2-F) and [`-E`](https://huggingface.co/canada-quant/GLM-5.3-Flash-DFlash2-E) (same architecture, K=7): 3.676 mean acceptance at K=7 on the 500-prompt holdout, +0.044 over the incoai reference measured on the same hardware (3.632) and +0.050 over `-F`. `-E` remains what the banked Spark numbers below were measured with.
 - **Lineage**: a public community DGX-Spark GLM-5.3-Flash bring-up image (re-hosted for reproducibility at `ghcr.io/canada-quant/vllm-glm53-flash-base:sm121-v11-dflash2`, pinned digest `sha256:4def0ef6…`; vLLM fork `0.1.dev20051+g487ecf187`, FlashInfer `0.6.18.dev20260819`, CUDA 13.0) **+ the two serving-critical canada-quant patches baked in** — `sparse_attn_indexer_kpool.py` (NoPE sparse-indexer top-k fix) and `kv_cache_utils.py` (`DFLASH2-DRAFTER-GROUP`), both sha256-gated at build time to the exact production bytes. No host-side patch bind-mounts needed to serve. (An experimental upstream-nightly-based build exists at `Dockerfile.experimental-upstream`; it is known-broken on SM121 — see "Known failures".)
 
 ## TL;DR — two nodes, four commands
@@ -55,16 +55,64 @@ The launcher's engine args are byte-derived from the authors' banked production 
 4. `Loaded DFlash mask embedding for mask_token_id 154856 from mask_embedding.pt` — **absence means the mask was silently ignored; do not serve**
 5. `FULL_AND_PIECEWISE` capture `[1,2,4,8,16,24,32]` in the engine config dump
 
-### 1M context
+### Context length and KV memory (corrected 2026-10-04)
 
-`MAX_MODEL_LEN=1048576 GMU=0.90 KV_CACHE_MEM=9663676416` (the launcher's published 1M guidance; pool ~1.36M tokens ≈ 1.30× a full 1M request).
+The DFlash2 drafters `-E` / `-F` / `-G` use 8 **full-attention** layers, so each one keeps a KV cache for the whole context (the incoai
+reference drafter keeps a 2,048-token sliding window). With our drafters the KV pool therefore holds **about 3× fewer tokens per GiB**.
+KV pools measured by the authors on 2× DGX Spark, fp8 KV:
+
+| drafter | KV pin | max model len | KV pool | date |
+|---|---|---|---|---|
+| incoai reference (sliding window) | 9 GiB | 1,048,576 | 1,360,420 tokens (≈7.1 KB/token) | 2026-08-31 |
+| `-E` / `-G` (launcher default) | 8 GiB | 262,144 | 366,749 tokens (≈22 KB/token) | 2026-09-16 |
+| `-G` | 16 GiB | 800,000 | 888,729 tokens (≈19 KB/token) | 2026-09-26 |
+
+- **With `-E` / `-F` / `-G`:** serve 262K (default, 8 GiB) or up to 800K with
+  `MAX_MODEL_LEN=800000 GMU=0.90 KV_CACHE_MEM=17179869184` (16 GiB; the 2026-09-26/27 runs).
+- **1M (`MAX_MODEL_LEN=1048576 GMU=0.90 KV_CACHE_MEM=9663676416`) is validated only with the incoai drafter** (2026-08-31). This section
+  previously paired that 9 GiB setting with our drafters; that was wrong — with `-E` / `-F` / `-G`, 9 GiB holds ≈450K tokens, less than one
+  1M request.
 
 ### Hard constraints (measured, not stylistic)
 
-- `num_speculative_tokens` **must be 7** (= `block_size − 1`). Other counts boot-wedge the DFlash2 stack.
+- `num_speculative_tokens=7` (= `block_size − 1`) is the trained and measured value. k=5 also boots on this image (2026-09-26, not
+  benchmarked); an earlier version of this README said other counts boot-wedge the stack, which was wrong.
 - `mask_embedding.pt` must sit next to the drafter weights (the launcher hard-checks it).
 - Cold boot ≈ 6–10 min (`VLLM_ENGINE_READY_TIMEOUT_S=3600` is load-bearing — cold JIT otherwise kills boot).
 - Graceful `docker stop -t 30` only — never `rm -f` a GPU-active container on GB10 (UVM wedge).
+
+## Drafter or the built-in MTP head?
+
+The W4A16 checkpoint ships GLM-5.3-Flash's own BF16 MTP head (layer 45), so it can also be served with native MTP
+(`{"method":"mtp","num_speculative_tokens":3}`) and no drafter at all.
+
+- **DFlash2-G:** short-context English and code, where its acceptance is highest (see the
+  [drafter card](https://huggingface.co/canada-quant/GLM-5.3-Flash-DFlash2-G)).
+- **Built-in MTP head (k=3):** long context, non-English text, or when you need the KV memory — the drafter's full-attention cache costs
+  about 3× more KV per token (table above).
+
+Measured by the authors (W4A16 + DFlash2-G on this image, 2× Spark, single stream, llama-benchy pp2048/tg128): **31.4 / 30.7 / 15.3 /
+10.0 tok/s** at context depth 0 / 4K / 65K / 100K (the depth-0 cell is tg32; 2026-09-28 quiet re-run, 100K from the 2026-09-26 grid).
+
+Community-reported (NVIDIA developer forum, 2026-10-04; different harness, GPU clock capped at 1700 MHz; not measured by us): the same
+W4A16 weights on eugr's b12x vLLM build with the built-in MTP head held **31.6 / 29.8 / 25.4 / 31.0 tok/s** at 0 / 4K / 65K / 100K. The
+same user found DFlash2-G 20–30% slower than MTP on non-English text (faster on English code), and saw usable context fall from ≈930K
+tokens to ≈330K with it.
+
+**Status:** native MTP on *this* image has not been validated by us yet. Our own same-pair comparison on 2× Spark — this image + MTP,
+this image + DFlash2-G, our weights on eugr's b12x build + MTP, and NVIDIA's NVFP4 on eugr's b12x build + MTP — has been running since
+2026-10-04 on a real bilingual generation workload. Results will be published here.
+
+### Running the W4A16 checkpoint on eugr's b12x build (community-validated, not one of our validated recipes)
+
+eugr/spark-vllm-docker's `--exp-b12x` build fuses the attention projections, so this checkpoint needs a config-side workaround
+([eugr/spark-vllm-docker#403](https://github.com/eugr/spark-vllm-docker/issues/403)): bind-mount a copy of `config.json` whose
+`quantization_config.ignore` adds `re:.*self_attn\..*`, `re:.*\.in_proj_qkvgfab.*` and `re:.*in_proj.*` (safe for this checkpoint:
+nothing under `self_attn` is quantized; narrow equivalent: `re:.*\.self_attn\.(f_a_proj|f_b_proj|in_proj_qkvgfab)$`). Serve with
+`--block-size 256 --moe-backend marlin --attention-backend B12X --linear-backend b12x --kv-cache-dtype fp8` (the INT4 experts run on
+Marlin) and MTP `{"method":"mtp","num_speculative_tokens":3,"attention_backend":"B12X"}`. Our DFlash2 drafters are untested there: b12x's
+kernels do not support full-window non-causal attention, so the drafter falls back to a generic path and its cache stays BF16
+(≈32 KB/token).
 
 ## Drafter pluggability (versioning protocol)
 
@@ -78,7 +126,7 @@ DRAFTER_HOST_PATH=/models/GLM-5.3-Flash-DFlash2-F bash launch_glm53_w4a16_dflash
 **Rules for a drop-in drafter:**
 
 1. **Dir layout**: `model.safetensors` + `config.json` + `mask_embedding.pt` (+ optional `PROVENANCE.txt`), exactly like [`GLM-5.3-Flash-DFlash2-G`](https://huggingface.co/canada-quant/GLM-5.3-Flash-DFlash2-G) / [`-F`](https://huggingface.co/canada-quant/GLM-5.3-Flash-DFlash2-F) / [`-E`](https://huggingface.co/canada-quant/GLM-5.3-Flash-DFlash2-E).
-2. **K follows the architecture**: `num_speculative_tokens = block_size − 1` (E: block 8 → K=7). Set `SPEC_NUM_TOKENS` to match; anything else boot-wedges.
+2. **K follows the architecture**: `num_speculative_tokens = block_size − 1` is the trained value (E / F / G: block 8 → K=7). Set `SPEC_NUM_TOKENS` to match; a smaller K also boots (k=5 verified 2026-09-26, not benchmarked).
 3. **Version discipline**: drafters are versioned by their HF repo id (`…-E`, `…-F`, …) with the config's `dflash_config.target_layer_ids` as the compatibility contract — the target-side aux-tap overlay honors whatever the drafter's config declares (9 taps for E: `[5,9,14,19,24,28,33,38,42]`). A drafter that changes tap geometry needs no image change; it needs its config to be truthful.
 4. **Verify after swap**: boot gate 4 (mask-loader line) + a sanity generation (below). No image rebuild, no target-side change.
 
