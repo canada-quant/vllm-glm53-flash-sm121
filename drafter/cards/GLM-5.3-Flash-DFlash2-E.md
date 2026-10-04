@@ -62,7 +62,7 @@ Per-position acceptance (K=7, c16): 0.744 · 0.545 · 0.405 · 0.306 · 0.237 ·
 
 ## Serving it on 2× DGX Spark (SM121)
 
-Prebuilt vLLM image + one-command launcher: [`canada-quant/vllm-glm53-flash-sm121`](https://github.com/canada-quant/vllm-glm53-flash-sm121) (`docker pull ghcr.io/canada-quant/vllm-glm53-flash-sm121:v2-w4a16-dflash2e`). The drafter is bind-mounted at runtime — swap drafters without a rebuild; K must follow the drafter's block size (E: block 8 → `num_speculative_tokens=7`).
+Prebuilt vLLM image + one-command launcher: [`canada-quant/vllm-glm53-flash-sm121`](https://github.com/canada-quant/vllm-glm53-flash-sm121) (`docker pull ghcr.io/canada-quant/vllm-glm53-flash-sm121:v2-w4a16-dflash2e`). The drafter is bind-mounted at runtime — swap drafters without a rebuild; K follows the drafter's block size (E: block 8 → `num_speculative_tokens=7`, the trained value).
 
 ## Same-rig A/B — 2× DGX Spark (SM121), TP=2, eager, K=7
 
@@ -92,12 +92,40 @@ Ready-to-run recipe: [`launch_dflash2_tp2.sh`](https://huggingface.co/canada-qua
 
 Hard constraints (all measured, not stylistic):
 
-- `num_speculative_tokens` **must be 7** (= block_size − 1). Other counts boot-wedge the DFlash2 stack.
+- `num_speculative_tokens: 7` (= block_size − 1) is the trained and measured value. k=5 also boots on the SM121 image (2026-09-26, not
+  benchmarked); an earlier version of this card said other counts boot-wedge the stack, which was wrong.
 - `mask_embedding.pt` must sit next to the weights. Verify the boot log carries `Loaded DFlash mask embedding for mask_token_id 154856 from mask_embedding.pt` — absence means the mask was silently ignored; do not serve.
 - The 9-tap config requires the serving stack to honor `dflash_config.target_layer_ids` of length 9 (upstream vLLM DFlash2 does — [vllm-project/vllm#52816](https://github.com/vllm-project/vllm/pull/52816)).
 - Full-attention drafter layers: the target stack must accept `FullAttentionSpec` drafter KV in the GLM-5 KV fast path. The stock upstream DFlash2 image cannot boot this drafter; see the [W4A16 card's SM121 serving section](https://huggingface.co/canada-quant/GLM-5.3-Flash-W4A16-MTP) for the working stack (patched SM121 build, fabric tuning, launcher).
 
 Our serving configuration: 2× DGX Spark GB10, TP=2 + expert-parallel, 262K context, fp8_e4m3 KV cache, K=7 greedy drafts — left up and serving since 2026-09-15 (smoke 4.243 @ 31.2 tok/s, c1 3.617 @ 28.2 tok/s post-swap verification, zero stream errors). **Serving state (updated 2026-09-16): the stack now runs the ruled graphs-ON g4 config — CUDA-graphs `FULL_AND_PIECEWISE` capture `[1,2,4,8,16,24,32]` + `VLLM_USE_BREAKABLE_CUDAGRAPH=0`, `GMU=0.795`, KV 8 GiB (pool 366,749 tokens)**; the flip boot re-verified all five production gates (pool discriminator, graphs live on both ranks, mask-loader line, zero-error smoke, zero engine faults). The DFlash2 speculator + selector walk the vLLM **V2 GPU-worker path at serve time** (confirmed 2026-09-16 from the boot bytes) — no V1-proposer silent-skip.
+
+## Memory cost — and when to use the built-in MTP head instead (added 2026-10-04)
+
+This drafter's 8 layers use **full attention**, so each keeps a KV cache for the whole context (same architecture as `-F` / `-G`); the incoai reference drafter keeps a
+2,048-token sliding window. KV pools measured by the authors on 2× DGX Spark (fp8 KV):
+
+| drafter | KV pin | max model len | KV pool | date |
+|---|---|---|---|---|
+| incoai reference | 9 GiB | 1,048,576 | 1,360,420 tokens (≈7.1 KB/token) | 2026-08-31 |
+| `-E` / `-G` | 8 GiB | 262,144 | 366,749 tokens (≈22 KB/token) | 2026-09-16 |
+| `-G` | 16 GiB | 800,000 | 888,729 tokens (≈19 KB/token) | 2026-09-26 |
+
+That is **about 3× less context per GiB of KV**. A 9 GiB pin holds ≈450K tokens with `-E` / `-F` / `-G` — less than one 1M request — so
+1M context on 2× Spark is validated only with the incoai drafter; with our drafters the validated contexts are 262K (8 GiB) and 800K
+(16 GiB).
+
+- **Use this drafter** for short-context English and code, where its acceptance is highest.
+- **Use GLM-5.3-Flash's built-in BF16 MTP head** (shipped in the W4A16 checkpoint; `{"method":"mtp","num_speculative_tokens":3}`) for long
+  context, non-English text, or KV headroom.
+- Measured by the authors (W4A16 + `-G`, 2× Spark, our SM121 image, single stream, llama-benchy pp2048/tg128): 31.4 / 30.7 / 15.3 / 10.0
+  tok/s at context depth 0 / 4K / 65K / 100K (2026-09-28; the 100K cell from 2026-09-26).
+- Community-reported (NVIDIA developer forum, 2026-10-04; not measured by us): on eugr's b12x vLLM build with the GPU clock capped at
+  1700 MHz, the W4A16 weights with the MTP head held 31.6 / 29.8 / 25.4 / 31.0 tok/s at the same depths; with `-G` usable context fell
+  from ≈930K to ≈330K tokens and decode was 20–30% slower on non-English text (faster on English code).
+- Our own same-pair comparison on 2× Spark (drafter vs MTP, plus eugr's b12x build) has been running since 2026-10-04 on a bilingual
+  generation workload; results will be published in
+  [`canada-quant/vllm-glm53-flash-sm121`](https://github.com/canada-quant/vllm-glm53-flash-sm121).
 
 ## Provenance
 
